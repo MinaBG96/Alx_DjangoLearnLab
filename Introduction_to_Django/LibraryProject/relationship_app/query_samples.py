@@ -1,16 +1,8 @@
-# relationship_app/query_samples.py
-
 import os
 import django
 import sys
-from pathlib import Path
 
-
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
-
-sys.path.append(str(PROJECT_ROOT))
-
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "LibraryProject.settings")
 django.setup()
@@ -18,54 +10,32 @@ django.setup()
 from relationship_app.models import Author, Book, Library, Librarian
 
 
-def main():
-    print("--- 1. Creating Test Data ---")
+def create_sample_data():
+    author_name = "Author One"
+    library_name = "Main Library"
 
-    # إنشاء المؤلفين
-    author1, _ = Author.objects.get_or_create(name="Author One")
-    author2, _ = Author.objects.get_or_create(name="Author Two")
+    author, _ = Author.objects.get_or_create(name=author_name)
+    library, _ = Library.objects.get_or_create(name=library_name)
+    book, _ = Book.objects.get_or_create(title="Book One", author=author)
+    library.books.add(book)
+    Librarian.objects.get_or_create(name="Librarian One", library=library)
 
-    # إنشاء الكتب
-    book1, _ = Book.objects.get_or_create(
-        title="Book A (by Author One)", author=author1
-    )
-    book2, _ = Book.objects.get_or_create(
-        title="Book B (by Author One)", author=author1
-    )
-    book3, _ = Book.objects.get_or_create(
-        title="Book C (by Author Two)", author=author2
-    )
 
-    library1, _ = Library.objects.get_or_create(name="Main Library")
+def queries():
+    author_name = "Author One"
+    author = Author.objects.get(name=author_name)
+    books_by_author = author.books.all()
+    print(f"Books by {author_name}: {[b.title for b in books_by_author]}")
 
-    library1.books.add(book1, book3)
+    library_name = "Main Library"
+    library = Library.objects.get(name=library_name)
+    books_in_library = library.books.all()
+    print(f"Books in {library_name}: {[b.title for b in books_in_library]}")
 
-    librarian1, _ = Librarian.objects.get_or_create(
-        name="Mr. Library Man", library=library1
-    )
-
-    print("Test data created/verified successfully.\n")
-
-    # -------------------------------------------------
-
-    print("--- 2. Running Required Queries ---")
-
-    print(f"\nQuery 1: All books by {author1.name}:")
-    books_by_author = author1.books.all()
-    for book in books_by_author:
-        print(f"- {book.title}")
-
-    print(f"\nQuery 2: All books in {library1.name}:")
-    books_in_library = library1.books.all()
-    for book in books_in_library:
-        print(f"- {book.title}")
-
-    print(f"\nQuery 3: Librarian for {library1.name}:")
-    librarian = library1.librarian
-    print(f"- {librarian.name}")
-
-    print("\n--- Queries Complete ---")
+    librarian = Librarian.objects.get(library=library)
+    print(f"Librarian for {library_name}: {librarian.name}")
 
 
 if __name__ == "__main__":
-    main()
+    create_sample_data()  # نتأكد من وجود بيانات أولاً
+    queries()
