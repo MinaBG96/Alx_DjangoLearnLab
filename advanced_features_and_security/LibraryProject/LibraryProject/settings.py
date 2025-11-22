@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+    
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "bookshelf.apps.BookshelfConfig",
     "relationship_app.apps.RelationshipAppConfig",
+    "accounts.apps.AccountsConfig"
 ]
 
 MIDDLEWARE = [
