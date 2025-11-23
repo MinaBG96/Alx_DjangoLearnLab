@@ -13,6 +13,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book, Author
 
 
+
 # --------------------------
 # Function-based view
 # --------------------------
@@ -182,3 +183,11 @@ def delete_book(request, book_id):
         return redirect('list_books')
     return render(request, 'relationship_app/delete_book.html', {'book': book})
 
+# from django.shortcuts import render
+# from django.contrib.auth.decorators import permission_required
+# from .models import Book
+
+# @permission_required('relationship_app.can_view', raise_exception=True)
+# def view_books(request):
+#     books = Book.objects.all()
+#     return render(request, 'relationship_app/view_books.html', {'books': books})
