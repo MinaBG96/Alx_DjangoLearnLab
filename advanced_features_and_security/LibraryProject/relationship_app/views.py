@@ -28,6 +28,49 @@ class LibraryDetailView(DetailView):
     model = Library
     template_name = "relationship_app/library_detail.html"
     context_object_name = "library"
+    
+# -----------------------------
+# CREATE BOOK (needs can_create)
+# -----------------------------
+@permission_required('relationship_app.can_create', raise_exception=True)
+def create_book(request):
+    if request.method == 'POST':
+        title = request.POST.get("title")
+        author_id = request.POST.get("author")
+        author = get_object_or_404(Author, id=author_id)
+        Book.objects.create(title=title, author=author)
+        return redirect('view_books')
+
+    authors = Author.objects.all()
+    return render(request, 'relationship_app/create_book.html', {'authors': authors})
+
+# -----------------------------
+# EDIT BOOK (needs can_edit)
+# -----------------------------
+@permission_required('relationship_app.can_edit', raise_exception=True)
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    if request.method == 'POST':
+        book.title = request.POST.get("title")
+        author_id = request.POST.get("author")
+        book.author = get_object_or_404(Author, id=author_id)
+        book.save()
+        return redirect('view_books')
+    authors = Author.objects.all()
+    return render(request, 'relationship_app/edit_book.html', {'book': book, 'authors': authors})
+
+# -----------------------------
+# DELETE BOOK (needs can_delete)
+# -----------------------------
+@permission_required('relationship_app.can_delete', raise_exception=True)
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('view_books')
+
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
 
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
