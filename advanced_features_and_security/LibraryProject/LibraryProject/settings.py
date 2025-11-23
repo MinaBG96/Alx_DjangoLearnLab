@@ -139,3 +139,63 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ---------- SECURITY (production) ----------
+# IMPORTANT: these MUST be enabled in production. During local development
+# you may set DEBUG = True temporarily, but for deployment DEBUG must be False.
+DEBUG = False
+
+# Redirect all HTTP -> HTTPS
+SECURE_SSL_REDIRECT = True            # force HTTPS
+
+# HSTS (HTTP Strict Transport Security)
+# 31536000 = one year (recommended for production after testing)
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Cookies only over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Browser protections
+SECURE_BROWSER_XSS_FILTER = True      # sets X-XSS-Protection header (modern browsers)
+SECURE_CONTENT_TYPE_NOSNIFF = True    # sets X-Content-Type-Options: nosniff
+X_FRAME_OPTIONS = "DENY"              # prevent clickjacking
+
+# If you're behind a reverse proxy (e.g. nginx) that terminates TLS,
+# tell Django how to detect secure requests. Adjust header name if needed.
+# Example: nginx sets `proxy_set_header X-Forwarded-Proto $scheme;`
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Content Security Policy fallback (if you don't use django-csp)
+# It's recommended to use django-csp in production and configure CSP policies there.
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'",)
+# --------------------------------------------
+# --------------------------------------------
+# SECURITY CONFIGURATION (HTTPS + Secure Headers)
+# --------------------------------------------
+
+# Force HTTPS redirect
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP → HTTPS
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Secure Cookies (only sent via HTTPS)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Browser security headers
+X_FRAME_OPTIONS = "DENY"                # Prevent clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True      # Prevent MIME sniffing
+SECURE_BROWSER_XSS_FILTER = True        # Enable browser XSS protection
+
+# Comment:
+# These settings enforce HTTPS across the site, force strict transport security,
+# secure cookies to prevent hijacking, and add headers to protect against XSS,
+# clickjacking, and content-type spoofing.
+# --------------------------------------------
