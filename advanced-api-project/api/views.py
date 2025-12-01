@@ -1,19 +1,38 @@
-from rest_framework import generics, permissions
 from .models import Book
 from .serializers import BookSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import generics, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+
+from .serializers import BookSerializer
+
 
 class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        year = self.request.query_params.get('year')
-        if year is not None:
-            queryset = queryset.filter(publication_year=year)
-        return queryset
+    filter_backends = [
+        DjangoFilterBackend,   # للـ filtering
+        filters.SearchFilter,  # للـ search
+        filters.OrderingFilter # للـ ordering
+    ]
+
+    # 1) FILTERING
+
+    #   /api/books/?title=Harry
+    #   /api/books/?author=1
+    #   /api/books/?publication_year=1997
+    filterset_fields = ['title', 'author', 'publication_year']
+
+    # 2) SEARCH
+    #   /api/books/?search=Rowling
+    #   /api/books/?search=Harry
+    search_fields = ['title', 'author__name']
+    ordering_fields = ['title', 'publication_year']
+    ordering = ['title']
+
 
 
 class BookDetailView(generics.RetrieveAPIView):
