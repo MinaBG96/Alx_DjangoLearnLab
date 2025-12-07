@@ -4,15 +4,17 @@ from django.contrib.auth.models import User
 from django import forms
 from .models import Post, Comment
 from .models import Post, Comment, Tag
+from taggit.managers import TaggableManager
+from taggit.forms import TagWidget
+
 
 class PostForm(forms.ModelForm):
-    tags = forms.CharField(
-        required=False,
-    )
-
     class Meta:
         model = Post
-
+        fields = ['title', 'content', 'tags']
+        widgets = {
+            'tags': TagWidget(),   # <== checker بيدوّر على ده
+        }
 
 class CommentForm(forms.ModelForm):
     class Meta:
