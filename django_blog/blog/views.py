@@ -38,20 +38,18 @@ class PostDetailView(DetailView):
         return context
     
 class CommentCreateView(LoginRequiredMixin, CreateView):
-
     model = Comment
     form_class = CommentForm
 
     def form_valid(self, form):
-        post_id = self.kwargs.get('post_id')
-        post = get_object_or_404(Post, pk=post_id)
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         form.instance.author = self.request.user
         form.instance.post = post
         return super().form_valid(form)
 
     def get_success_url(self):
-        # بعد إضافة التعليق ارجع لصفحة البوست
         return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+
 
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
