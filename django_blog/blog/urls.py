@@ -9,6 +9,8 @@ from .views import (
     CommentCreateView,
     CommentUpdateView,
     CommentDeleteView,
+    TagPostListView,
+    PostSearchListView,
 )
 
 urlpatterns = [
@@ -23,6 +25,11 @@ urlpatterns = [
 
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
+        # عرض البوستات حسب Tag
+    path('tags/<str:tag_name>/', TagPostListView.as_view(), name='posts-by-tag'),
+
+    # صفحة البحث
+    path('search/', PostSearchListView.as_view(), name='post-search'),
     path("login/", CustomLoginView.as_view(), name="login"),
     path("logout/", CustomLogoutView.as_view(), name="logout"),
     path("register/", register, name="register"),

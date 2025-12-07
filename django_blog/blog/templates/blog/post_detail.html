@@ -4,6 +4,7 @@
     <title>{{ post.title }}</title>
 </head>
 <body>
+
     <a href="{% url 'post-list' %}">← Back to all posts</a>
 
     <h1>{{ post.title }}</h1>
@@ -13,6 +14,19 @@
     {% if user == post.author %}
         <a href="{% url 'post-update' post.pk %}">Edit Post</a> |
         <a href="{% url 'post-delete' post.pk %}">Delete Post</a>
+    {% endif %}
+
+    <hr>
+    <h3>Tags:</h3>
+    {% if post.tags.all %}
+        <p>
+            {% for tag in post.tags.all %}
+                <a href="{% url 'posts-by-tag' tag.name %}">#{{ tag.name }}</a>
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    {% else %}
+        <p>No tags.</p>
     {% endif %}
 
     <hr>
@@ -34,6 +48,7 @@
 
     <hr>
     <h3>Add a comment</h3>
+
     {% if user.is_authenticated %}
         <form method="post" action="{% url 'comment-create' post.pk %}">
             {% csrf_token %}
@@ -43,5 +58,6 @@
     {% else %}
         <p><a href="{% url 'login' %}">Login</a> to add a comment.</p>
     {% endif %}
+
 </body>
 </html>

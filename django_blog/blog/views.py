@@ -13,8 +13,10 @@ from django.views.generic import (
 )
 from django.shortcuts import get_object_or_404, redirect
 
-from .models import Post, Comment
 from .forms import PostForm, CommentForm
+from django.db.models import Q
+from .models import Post, Comment, Tag
+
 
 
 class PostListView(ListView):
@@ -53,10 +55,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    """
-    تعديل تعليق.
-    - فقط صاحب التعليق يقدر يعدل.
-    """
+
     model = Comment
     form_class = CommentForm
     template_name = 'blog/comment_form.html'
@@ -89,7 +88,7 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    ordering = ['-created_at']  # أحدث البوستات أولاً
+    ordering = ['-created_at'] 
 
 
 class PostDetailView(DetailView):
@@ -100,29 +99,60 @@ class PostDetailView(DetailView):
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
-
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        # معالجة التاجات
+        tags_str = form.cleaned_data.get('tags', '')
+        tags_list = [t.strip() for t in tags_str.split(',') if t.strip()]
+        tag_objects = []
+        for tag_name in tags_list:
+            tag_obj, created = Tag.objects.get_or_create(name=tag_name)
+            tag_objects.append(tag_obj)
+        self.object.tags.set(tag_objects)
+
+        return response
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['tags'] = ''
+        return initial
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        tags_str = form.cleaned_data.get('tags', '')
+        tags_list = [t.strip() for t in tags_str.split(',') if t.strip()]
+        tag_objects = []
+        for tag_name in tags_list:
+            tag_obj, created = Tag.objects.get_or_create(name=tag_name)
+            tag_objects.append(tag_obj)
+        self.object.tags.set(tag_objects)
+
+        return response
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.object:
+            initial['tags'] = ', '.join(self.object.tags.values_list('name', flat=True))
+        return initial
 
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
 
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -166,3 +196,40 @@ def profile(request):
     else:
         form = UserUpdateForm(instance=request.user)
     return render(request, "blog/profile.html", {"form": form})
+
+class TagPostListView(ListView):
+    model = Post
+    template_name = 'blog/tag_post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')
+        return Post.objects.filter(tags__name=tag_name).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag_name'] = self.kwargs.get('tag_name')
+        return context
+
+class PostSearchListView(ListView):
+
+    model = Post
+    template_name = 'blog/post_search_results.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        qs = Post.objects.all()
+        if query:
+            qs = qs.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        return context
+

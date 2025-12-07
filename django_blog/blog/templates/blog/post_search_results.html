@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search results</title>
+  </head>
+  <body>
+    <h1>Search results for "{{ query }}"</h1>
+    <a href="{% url 'post-list' %}">← Back to posts</a>
+
+    <form method="get" action="{% url 'post-search' %}">
+      <input type="text" name="q" placeholder="ابحث..." value="{{ query }}" />
+      <button type="submit">Search</button>
+    </form>
+
+    <ul>
+      {% for post in posts %}
+      <li>
+        <h2><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h2>
+        <p>{{ post.content|truncatechars:150 }}</p>
+      </li>
+      {% empty %}
+      <li>No posts found.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

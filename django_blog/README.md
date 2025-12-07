@@ -30,3 +30,23 @@ Comment Model:
 - content: TextField
 - created_at: auto_add_now
 - updated_at: auto_now
+
+# Tagging and Search Features
+
+Tagging:
+- Each Post can have multiple Tags.
+- Tags are entered as a comma-separated list in the post form (e.g. "django, backend, api").
+- Tags are automatically created if they do not exist.
+- On the post detail page, tags are shown and each tag links to a page showing all posts with that tag.
+
+Search:
+- A search bar is available on the posts list page.
+- Search matches:
+  - Post title
+  - Post content
+  - Tag names
+- Search results are shown at `/search/?q=<keyword>`.
+
+URLs:
+- View posts by tag: `/tags/<tag_name>/`
+- Search posts: `/search/?q=<keyword>`
