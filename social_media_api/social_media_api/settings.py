@@ -70,6 +70,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
 ROOT_URLCONF = 'social_media_api.urls'
 
 TEMPLATES = [
@@ -141,7 +143,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    ...
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
