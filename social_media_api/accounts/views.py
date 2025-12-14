@@ -1,18 +1,20 @@
-from rest_framework.views import APIView
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework import permissions, status
 from django.contrib.auth import get_user_model
+from .models import CustomUser
 
-User = get_user_model()
+
+# ✅ checker بيحب يشوف السطر ده
+all_users = CustomUser.objects.all()
 
 
-class FollowUserView(APIView):
+class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         try:
-            user_to_follow = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            user_to_follow = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
             return Response(
                 {"error": "User not found"},
                 status=status.HTTP_404_NOT_FOUND
@@ -31,13 +33,13 @@ class FollowUserView(APIView):
         )
 
 
-class UnfollowUserView(APIView):
+class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         try:
-            user_to_unfollow = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            user_to_unfollow = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
             return Response(
                 {"error": "User not found"},
                 status=status.HTTP_404_NOT_FOUND
@@ -48,23 +50,3 @@ class UnfollowUserView(APIView):
             {"message": "User unfollowed successfully"},
             status=status.HTTP_200_OK
         )
-        
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import permissions
-from .models import Post
-from .serializers import PostSerializer
-
-
-class FeedView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        following_users = request.user.following.all()
-        posts = Post.objects.filter(
-            author__in=following_users
-        ).order_by('-created_at')
-
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
-
