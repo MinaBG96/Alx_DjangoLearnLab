@@ -15,3 +15,5 @@ Custom user with:
 - bio
 - profile_picture
 - followers system
+
+token = 'd0672f96e359fe5a6a3d013b7452dc4074770c17'
