@@ -13,3 +13,14 @@ DELETE /api/comments/{id}/
 Authentication: Token
 Authorization Header:
 Authorization: Token <token>
+
+## Follow System
+POST /api/accounts/follow/{user_id}/
+POST /api/accounts/unfollow/{user_id}/
+
+## Feed
+GET /api/feed/
+
+Authentication:
+Authorization: Token <token>
+
