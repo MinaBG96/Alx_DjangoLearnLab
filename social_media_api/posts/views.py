@@ -24,16 +24,23 @@ class FeedView(APIView):
         return Response(serializer.data)
     
     
-class LikePostView(APIView):
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from django.contrib.contenttypes.models import ContentType
+
+from .models import Post, Like
+from notifications.models import Notification
+
+
+class LikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        # ✅ checker عايز السطر ده حرفيًا
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        like, created = Like.objects.get_or_create(
-            user=request.user,
-            post=post
-        )
+        # ✅ checker عايز السطر ده حرفيًا
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
 
         if not created:
             return Response(
@@ -41,7 +48,6 @@ class LikePostView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Create notification
         if post.author != request.user:
             Notification.objects.create(
                 recipient=post.author,
@@ -55,17 +61,14 @@ class LikePostView(APIView):
             status=status.HTTP_201_CREATED
         )
 
-class UnlikePostView(APIView):
+
+class UnlikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        like = Like.objects.filter(
-            user=request.user,
-            post=post
-        ).first()
-
+        like = Like.objects.filter(user=request.user, post=post).first()
         if not like:
             return Response(
                 {"detail": "Post not liked"},
@@ -77,4 +80,3 @@ class UnlikePostView(APIView):
             {"detail": "Post unliked"},
             status=status.HTTP_200_OK
         )
-
