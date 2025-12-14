@@ -23,9 +23,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5!11&lkf&hkq#clwk5qj607f*fbv7x$m_4o-1u-kvsagm@)mh&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+import os
 
-ALLOWED_HOSTS = []
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+DEBUG = False
+
+ALLOWED_HOSTS = [
+    'social_media_api.herokuapp.com',
+    '127.0.0.1'
+]
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 
 
 # Application definition
@@ -76,7 +92,7 @@ WSGI_APPLICATION = 'social_media_api.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+import dj_database_url
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -119,7 +135,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    ...
+]
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
