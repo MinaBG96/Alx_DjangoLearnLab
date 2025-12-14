@@ -24,3 +24,14 @@ GET /api/feed/
 Authentication:
 Authorization: Token <token>
 
+## Likes
+POST /api/posts/{id}/like/
+POST /api/posts/{id}/unlike/
+
+## Notifications
+GET /api/notifications/
+
+Authentication:
+Authorization: Token <token>
+
+
